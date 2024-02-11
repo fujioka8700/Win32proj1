@@ -133,14 +133,14 @@
     <ClInclude Include="Win32proj1.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Win32proj1.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Win32proj1.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico" />
     <Image Include="Win32proj1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Win32proj1.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

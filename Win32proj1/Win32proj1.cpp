@@ -16,7 +16,7 @@ INT WINAPI WinMain(_In_ HINSTANCE hInstance,
         _In_ LPSTR lpCmdLine,
         _In_ int nShowCmd)
 {
-    MessageBox(NULL, _T(""), _T(""), MB_OK);
+    MessageBox(NULL, _T("ˆ—‚Í¬Œ÷‚µ‚Ü‚µ‚½B"), _T("î•ñ"), MB_OK | MB_ICONINFORMATION);
 
     return 0;
 }

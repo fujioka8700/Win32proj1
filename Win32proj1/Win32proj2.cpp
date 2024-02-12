@@ -16,8 +16,12 @@
 //文字列描画用配列
 TCHAR   szstr[256] = _T("ボタンを押していません");
 
-//ポイント構造体
-POINT  pt = { 5, 5 };
+//  開始点
+POINT  pt_start = { 0, 0 };
+//  終了点
+POINT pt_end = { 0, 0 };
+//  ドラッグ中かどうかを示すフラグ
+INT iDragFlag = 0;
 
 //  インスタンス（グローバル変数）
 HINSTANCE hInst;
@@ -30,8 +34,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
     LPSTR lpCmdLine,
     int nCmdShow)
 {
-    static TCHAR szWindowClass[] = _T("Sample05");
-    static TCHAR szTitle[] = _T("マウスイベントを処理するプログラム①");
+    static TCHAR szWindowClass[] = _T("Sample06");
+    static TCHAR szTitle[] = _T("マウスイベントを処理するプログラム②");
 
     WNDCLASSEX wcex;
 
@@ -52,7 +56,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     {
         MessageBox(NULL,
             _T("RegisterClassExの処理に失敗しました"),
-            _T("Sample05"),
+            _T("Sample06"),
             NULL);
 
         return 1;
@@ -86,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     {
         MessageBox(NULL,
             _T("ウィンドウ生成に失敗しました!"),
-            _T("Sample05"),
+            _T("Sample06"),
             NULL);
         return 1;
     }
@@ -118,10 +122,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_PAINT:
         //  描画処理の開始
         hdc = BeginPaint(hWnd, &ps);
-        // 文字列の出力。
-        TextOut(hdc,
-            pt.x, pt.y,
-            szstr, _tcslen(szstr));
+        // ドラッグ中だったら、始点から終点まで線を引く
+        if (iDragFlag) {
+            MoveToEx(hdc, pt_start.x, pt_start.y, NULL);
+            LineTo(hdc, pt_end.x, pt_end.y);
+        }
         //  ペイント処理の終了
         EndPaint(hWnd, &ps);
         break;
@@ -129,11 +134,22 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return 0;
         //左クリック
     case WM_LBUTTONDOWN:
-        pt.x = LOWORD(lParam);
-        pt.y = HIWORD(lParam);
-        InvalidateRect(hWnd, NULL, TRUE); //更新
+        //  始点の位置の座標を取得
+        pt_start.x = LOWORD(lParam);
+        pt_start.y = HIWORD(lParam);
+        //  ドラッグ中でなければ、終点もこの点に設定する。
+        if (!iDragFlag) {
+            pt_end = pt_start;
+            //  ドラッグ中かどうかのフラグを立てる
+            iDragFlag = 1;
+        }
+        //  描画の更新
+        InvalidateRect(hWnd, NULL, TRUE);
         break;
     case WM_LBUTTONUP:
+        //  ドラッグ中かどうかのフラグを元に戻す
+        iDragFlag = 0;
+        InvalidateRect(hWnd, NULL, TRUE);
         break;
     case WM_LBUTTONDBLCLK:
         break;
@@ -150,10 +166,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_MBUTTONDBLCLK:
         break;
     case WM_MOUSEMOVE:
-        _stprintf_s(szstr, _T("現在の座標（%d,%d)"), LOWORD(lParam), HIWORD(lParam));
-        //再描画メッセージを発生させる
-        InvalidateRect(hWnd, NULL, TRUE);
-        return 0;
+        //  マウスが移動した
+        if (iDragFlag) {
+            pt_end.x = LOWORD(lParam);
+            pt_end.y = HIWORD(lParam);
+            //再描画メッセージを発生させる
+            InvalidateRect(hWnd, NULL, TRUE);
+            return 0;
+        }
         break;
         //キーを押した
     case WM_KEYDOWN:

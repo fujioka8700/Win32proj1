@@ -1,5 +1,5 @@
 // ************************************
-// Ex ウインドウ描画の雛形
+// Ex 文字列を表示するプログラム
 // ************************************
 //必要なヘッダーファイルのインクルード
 #define STRICT
@@ -19,13 +19,13 @@ HINSTANCE hInst;
 //  ウィンドウプロシージャのコールバック関数
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
-int WINAPI WinMain(_In_ HINSTANCE hInstance,
-        _In_opt_  HINSTANCE hPrevInstance,
-        _In_ LPSTR lpCmdLine,
-        _In_ int nShowCmd)
+int WINAPI WinMain(HINSTANCE hInstance,
+    HINSTANCE hPrevInstance,
+    LPSTR lpCmdLine,
+    int nCmdShow)
 {
-    static TCHAR szWindowClass[] = _T("Sample02");
-    static TCHAR szTitle[] = _T("ウィンドウを使ったアプリのサンプル①");
+    static TCHAR szWindowClass[] = _T("Sample03");
+    static TCHAR szTitle[] = _T("ウィンドウを使ったアプリのサンプル②");
 
     WNDCLASSEX wcex;
 
@@ -46,7 +46,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance,
     {
         MessageBox(NULL,
             _T("RegisterClassExの処理に失敗しました"),
-            _T("Sample02"),
+            _T("Sample03"),
             NULL);
 
         return 1;
@@ -80,7 +80,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance,
     {
         MessageBox(NULL,
             _T("ウィンドウ生成に失敗しました!"),
-            _T("Sample02"),
+            _T("Sample03"),
             NULL);
         return 1;
     }
@@ -89,7 +89,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance,
     // hWnd     : CreateWindowの戻り値
     // nCmdShow : WinMainの引数の4番目
     ShowWindow(hWnd,
-        nShowCmd);
+        nCmdShow);
     UpdateWindow(hWnd);
 
     // メインのメッセージループ:
@@ -105,8 +105,21 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance,
 //  ウィンドウプロシージャ（メッセージに対するコールバック関数）
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    PAINTSTRUCT ps;
+    HDC hdc;
+    TCHAR greeting[] = _T("Hello, World!");
     switch (message)
     {
+    case WM_PAINT:
+        //  描画処理の開始
+        hdc = BeginPaint(hWnd, &ps);
+        // 文字列の出力。「Hello, World!」と出力する。
+        TextOut(hdc,
+            5, 5,
+            greeting, _tcslen(greeting));
+        //  ペイント処理の終了
+        EndPaint(hWnd, &ps);
+        break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;

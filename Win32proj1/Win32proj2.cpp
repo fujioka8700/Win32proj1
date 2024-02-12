@@ -1,5 +1,5 @@
 // ************************************
-// Ex キーボードのイベント処理を行う
+// Ex マウスのイベント処理を行う①
 // ************************************
 //必要なヘッダーファイルのインクルード
 #define STRICT
@@ -14,10 +14,10 @@
 #define WINDOW_HEIGHT   600
 
 //文字列描画用配列
-TCHAR   szstr[256] = _T("キーを押していません");
+TCHAR   szstr[256] = _T("ボタンを押していません");
 
 //ポイント構造体
-POINT  pt = { 400, 200 };
+POINT  pt = { 5, 5 };
 
 //  インスタンス（グローバル変数）
 HINSTANCE hInst;
@@ -30,13 +30,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
     LPSTR lpCmdLine,
     int nCmdShow)
 {
-    static TCHAR szWindowClass[] = _T("Sample04");
-    static TCHAR szTitle[] = _T("キーボードのイベントを処理するプログラム");
+    static TCHAR szWindowClass[] = _T("Sample05");
+    static TCHAR szTitle[] = _T("マウスイベントを処理するプログラム①");
 
     WNDCLASSEX wcex;
 
     wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
     wcex.lpfnWndProc = WndProc;
     wcex.cbClsExtra = 0;
     wcex.cbWndExtra = 0;
@@ -52,7 +52,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     {
         MessageBox(NULL,
             _T("RegisterClassExの処理に失敗しました"),
-            _T("Sample04"),
+            _T("Sample05"),
             NULL);
 
         return 1;
@@ -86,7 +86,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     {
         MessageBox(NULL,
             _T("ウィンドウ生成に失敗しました!"),
-            _T("Sample04"),
+            _T("Sample05"),
             NULL);
         return 1;
     }
@@ -120,45 +120,51 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         hdc = BeginPaint(hWnd, &ps);
         // 文字列の出力。
         TextOut(hdc,
-            5, 5,
+            pt.x, pt.y,
             szstr, _tcslen(szstr));
         //  ペイント処理の終了
         EndPaint(hWnd, &ps);
         break;
         //キーを押した
+        return 0;
+        //左クリック
+    case WM_LBUTTONDOWN:
+        pt.x = LOWORD(lParam);
+        pt.y = HIWORD(lParam);
+        InvalidateRect(hWnd, NULL, TRUE); //更新
+        break;
+    case WM_LBUTTONUP:
+        break;
+    case WM_LBUTTONDBLCLK:
+        break;
+    case WM_RBUTTONDOWN:
+        break;
+    case WM_RBUTTONUP:
+        break;
+    case WM_RBUTTONDBLCLK:
+        break;
+    case WM_MBUTTONDOWN:
+        break;
+    case WM_MBUTTONUP:
+        break;
+    case WM_MBUTTONDBLCLK:
+        break;
+    case WM_MOUSEMOVE:
+        _stprintf_s(szstr, _T("現在の座標（%d,%d)"), LOWORD(lParam), HIWORD(lParam));
+        //再描画メッセージを発生させる
+        InvalidateRect(hWnd, NULL, TRUE);
+        return 0;
+        break;
+        //キーを押した
     case WM_KEYDOWN:
         switch (wParam)
         {
-            //  エスケープキーの場合
         case VK_ESCAPE:
             //終了メッセージを発生させる
             PostMessage(hWnd, WM_CLOSE, 0, 0);
             break;
-            //  スペースキーの場合
-        case VK_SPACE:
-            _stprintf_s(szstr, _T("%s"), _T("スペースキーを押しました"));
-            break;
-            //  Aキーの場合
-        case 'A':
-            _stprintf_s(szstr, _T("%s"), _T("Aキーを押しました"));
-            break;
-            //  Bキーの場合
-        case 0x42:
-            _stprintf_s(szstr, _T("%s"), _T("Bキーを押しました"));
-            break;
-        default:
-            _stprintf_s(szstr, _T("%s"), _T("キーを押しました"));
-            break;
         }
-        //再描画メッセージを発生させる
-        InvalidateRect(hWnd, NULL, TRUE);
-        return 0;
-        //キーを放した
-    case WM_KEYUP:
-        _stprintf_s(szstr, _T("%s"), _T("キーを押していません"));
-        //再描画メッセージを発生させる
-        InvalidateRect(hWnd, NULL, TRUE);
-        return 0;
+        break;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
@@ -166,6 +172,5 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hWnd, message, wParam, lParam);
         break;
     }
-
     return 0;
 }

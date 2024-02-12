@@ -1,5 +1,5 @@
 // ************************************
-// Ex 文字列を表示するプログラム
+// Ex キーボードのイベント処理を行う
 // ************************************
 //必要なヘッダーファイルのインクルード
 #define STRICT
@@ -13,6 +13,12 @@
 #define WINDOW_WIDTH    800
 #define WINDOW_HEIGHT   600
 
+//文字列描画用配列
+TCHAR   szstr[256] = _T("キーを押していません");
+
+//ポイント構造体
+POINT  pt = { 400, 200 };
+
 //  インスタンス（グローバル変数）
 HINSTANCE hInst;
 
@@ -24,8 +30,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
     LPSTR lpCmdLine,
     int nCmdShow)
 {
-    static TCHAR szWindowClass[] = _T("Sample03");
-    static TCHAR szTitle[] = _T("ウィンドウを使ったアプリのサンプル②");
+    static TCHAR szWindowClass[] = _T("Sample04");
+    static TCHAR szTitle[] = _T("キーボードのイベントを処理するプログラム");
 
     WNDCLASSEX wcex;
 
@@ -46,7 +52,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     {
         MessageBox(NULL,
             _T("RegisterClassExの処理に失敗しました"),
-            _T("Sample03"),
+            _T("Sample04"),
             NULL);
 
         return 1;
@@ -80,7 +86,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     {
         MessageBox(NULL,
             _T("ウィンドウ生成に失敗しました!"),
-            _T("Sample03"),
+            _T("Sample04"),
             NULL);
         return 1;
     }
@@ -107,19 +113,52 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     PAINTSTRUCT ps;
     HDC hdc;
-    TCHAR greeting[] = _T("Hello, World!");
     switch (message)
     {
     case WM_PAINT:
         //  描画処理の開始
         hdc = BeginPaint(hWnd, &ps);
-        // 文字列の出力。「Hello, World!」と出力する。
+        // 文字列の出力。
         TextOut(hdc,
             5, 5,
-            greeting, _tcslen(greeting));
+            szstr, _tcslen(szstr));
         //  ペイント処理の終了
         EndPaint(hWnd, &ps);
         break;
+        //キーを押した
+    case WM_KEYDOWN:
+        switch (wParam)
+        {
+            //  エスケープキーの場合
+        case VK_ESCAPE:
+            //終了メッセージを発生させる
+            PostMessage(hWnd, WM_CLOSE, 0, 0);
+            break;
+            //  スペースキーの場合
+        case VK_SPACE:
+            _stprintf_s(szstr, _T("%s"), _T("スペースキーを押しました"));
+            break;
+            //  Aキーの場合
+        case 'A':
+            _stprintf_s(szstr, _T("%s"), _T("Aキーを押しました"));
+            break;
+            //  Bキーの場合
+        case 0x42:
+            _stprintf_s(szstr, _T("%s"), _T("Bキーを押しました"));
+            break;
+        default:
+            _stprintf_s(szstr, _T("%s"), _T("キーを押しました"));
+            break;
+        }
+        //再描画メッセージを発生させる
+        InvalidateRect(hWnd, NULL, TRUE);
+        return 0;
+        //キーを放した
+    case WM_KEYUP:
+        _stprintf_s(szstr, _T("%s"), _T("キーを押していません"));
+        //再描画メッセージを発生させる
+        InvalidateRect(hWnd, NULL, TRUE);
+        return 0;
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
